@@ -17,7 +17,11 @@ notesDisplay.addEventListener("click", (event) =>{
         case "del" :
             arrayOfNotes = arrayOfNotes.filter(({id}) =>  id.toString() !== noteId);
             showOtherNotes.innerHTML = renderNotes(arrayOfNotes);
+            showPinnedNotes.innerHTML =  renderNotes(arrayOfNotes.filter(({id}) => id.toString === noteId));
             localStorage.setItem("notes",JSON.stringify(arrayOfNotes));
+            break;
+        case "pinned" : 
+            arrayOfNotes = arrayOfNotes.map(note => note.id.toString() === nodeId ? {...note,isPinned : !note.isPinned}: note)
     }
 })
 
