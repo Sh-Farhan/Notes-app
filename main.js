@@ -6,8 +6,13 @@ let addNoteButton = document.querySelector(".add-btn");
 let notesDisplay = document.querySelector(".notes-display"); 
 let showOtherNotes = document.querySelector(".notes-container");
 let showPinnedNotes = document.querySelector(".pinned-notes-container");  
-
+let pinTitle = document.querySelector(".pin-title");
+let otherTitle = document.querySelector(".other-title");
 let arrayOfNotes = JSON.parse(localStorage.getItem("notes")) || [];
+if(arrayOfNotes > 0){
+    pinTitle.classList.toggle("d-none");
+    otherTitle.classList.toggle("d-none");
+}
 
 notesDisplay.addEventListener("click", (event) =>{
     let type = event.target.dataset.type;
@@ -16,12 +21,21 @@ notesDisplay.addEventListener("click", (event) =>{
     switch(type){
         case "del" :
             arrayOfNotes = arrayOfNotes.filter(({id}) =>  id.toString() !== noteId);
-            showOtherNotes.innerHTML = renderNotes(arrayOfNotes);
-            showPinnedNotes.innerHTML =  renderNotes(arrayOfNotes.filter(({id}) => id.toString === noteId));
+            showOtherNotes.innerHTML = renderNotes(arrayOfNotes.filter(({isPinned,isArchived}) => !isPinned && !isArchived));
             localStorage.setItem("notes",JSON.stringify(arrayOfNotes));
+            showPinnedNotes.innerHTML = renderNotes(arrayOfNotes.filter(({isPinned}) => isPinned));    
             break;
         case "pinned" : 
-            arrayOfNotes = arrayOfNotes.map(note => note.id.toString() === nodeId ? {...note,isPinned : !note.isPinned}: note)
+            arrayOfNotes = arrayOfNotes.map(note => note.id.toString() === noteId ? {...note,isPinned : !note.isPinned}: note)
+            showOtherNotes.innerHTML = renderNotes(arrayOfNotes.filter(({isPinned,isArchived}) => !isPinned && !isArchived));
+            showPinnedNotes.innerHTML = renderNotes(arrayOfNotes.filter(({isPinned}) => isPinned))
+            localStorage.setItem("notes", JSON.stringify(arrayOfNotes));
+            break;
+        case "archive":
+            arrayOfNotes = arrayOfNotes.map(note => note.id.toString() == noteId ? {...note,isArchived : !note.isArchived} : note);
+            showOtherNotes.innerHTML = renderNotes(arrayOfNotes.filter(({isArchived}) => !isArchived));
+
+
     }
 })
 
@@ -34,4 +48,5 @@ addNoteButton.addEventListener("click",()=> {
     }
 })  
 
-showOtherNotes.innerHTML = renderNotes(arrayOfNotes)
+showOtherNotes.innerHTML = renderNotes(arrayOfNotes.filter(({isPinned,isArchived}) => !isPinned && !isArchived));
+showPinnedNotes.innerHTML = renderNotes(arrayOfNotes.filter(({isPinned}) => isPinned)); 
